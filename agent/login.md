@@ -10,7 +10,7 @@ This is the source of truth for the login screen. Update this document with the 
 2. After 1.6 seconds, the splash screen is replaced by `LoginScreen`.
 3. The login screen shows the logo, Retailer/Supplier selector, username and password fields, a CAPTCHA mockup, Login button, and copyright footer.
 
-The splash, brand lockup, and login screen currently live in `lib/main.dart`. The logo asset is `assets/images/topitup_logo.png`; its registration is in `pubspec.yaml`. Shared colors and theme settings live in `lib/theme/`.
+The app root lives in `lib/main.dart`, the splash screen in `lib/screens/splash.dart`, the login screen in `lib/screens/login.dart`, and the shared brand lockup in `lib/shared/widgets/topitup_brand_lockup.dart`. The logo asset is `assets/images/topitup_logo.png`; its registration is in `pubspec.yaml`. Shared colors and theme settings live in `lib/theme/`.
 
 ## Design contract
 
