@@ -16,22 +16,88 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _usernameController = TextEditingController();
-  final _passwordController = TextEditingController();
+  final _retailerUsernameController = TextEditingController();
+  final _supplierEmailController = TextEditingController();
+  final _retailerPasswordController = TextEditingController();
+  final _supplierPasswordController = TextEditingController();
   bool _obscurePassword = true;
   bool _captchaChecked = false;
   bool _isRetailer = true;
+  String? _usernameError;
+  String? _passwordError;
+  String? _captchaError;
+
+  TextEditingController get _identityController =>
+      _isRetailer ? _retailerUsernameController : _supplierEmailController;
+
+  TextEditingController get _passwordController =>
+      _isRetailer ? _retailerPasswordController : _supplierPasswordController;
 
   // Integration placeholders for the backend and local database.
   // These intentionally contain no implementation and are not connected to UI.
   Future<void> callLoginApi() async {}
   Future<void> callDatabase() async {}
+  void _validateAndLogin() {
+    final username = _identityController.text.trim();
+    final password = _passwordController.text;
+    final identityError = username.isEmpty
+        ? (_isRetailer
+              ? 'Please enter your username or terminal ID.'
+              : 'Please enter your supplier email address.')
+        : (!_isRetailer &&
+                  !RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(username)
+              ? 'Please enter a valid email address.'
+              : null);
+
+    if (identityError != null) {
+      _showValidationError(usernameError: identityError);
+      return;
+    }
+
+    if (password.isEmpty) {
+      _showValidationError(passwordError: 'Please enter your password.');
+      return;
+    }
+
+    if (!_captchaChecked) {
+      _showValidationError(
+        captchaError: 'Please check the box to verify you are not a robot.',
+      );
+      return;
+    }
+
+    onLoginButtonPressed();
+  }
+
   void onLoginButtonPressed() {}
+
+  void _showValidationError({
+    String? usernameError,
+    String? passwordError,
+    String? captchaError,
+  }) {
+    setState(() {
+      _usernameError = usernameError;
+      _passwordError = passwordError;
+      _captchaError = captchaError;
+    });
+  }
+
+  void _selectRole(bool retailer) {
+    if (_isRetailer == retailer) return;
+    setState(() {
+      _isRetailer = retailer;
+      _usernameError = null;
+      _passwordError = null;
+    });
+  }
 
   @override
   void dispose() {
-    _usernameController.dispose();
-    _passwordController.dispose();
+    _retailerUsernameController.dispose();
+    _supplierEmailController.dispose();
+    _retailerPasswordController.dispose();
+    _supplierPasswordController.dispose();
     super.dispose();
   }
 
@@ -56,76 +122,109 @@ class _LoginScreenState extends State<LoginScreen> {
                 top: 24 * scale,
                 left: sideInset,
                 right: sideInset,
+                bottom: 16 * scale,
               ),
               child: Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 820),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      TopitupBrandLockup(width: 288 * scale),
-                      SizedBox(height: 50 * scale),
-                      Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.symmetric(
-                          horizontal: panelPadding - 16 * scale,
-                          vertical: panelPadding,
+                  child: SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: math.max(
+                          0.0,
+                          constraints.maxHeight - 24 * scale - 16 * scale,
                         ),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(34 * scale),
-                          border: Border.all(
-                            color: const Color(0xFFE0E8F1),
-                            width: 1.5,
-                          ),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Color(0x0B253B53),
-                              blurRadius: 28,
-                              offset: Offset(0, 8),
-                            ),
-                          ],
-                        ),
+                      ),
+                      child: Center(
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            _buildRoleSelector(scale),
-                            SizedBox(height: 34 * scale),
-                            Padding(
+                            TopitupBrandLockup(width: 288 * scale),
+                            SizedBox(height: 50 * scale),
+                            Container(
+                              width: double.infinity,
                               padding: EdgeInsets.symmetric(
-                                horizontal: 16 * scale,
+                                horizontal: panelPadding - 16 * scale,
+                                vertical: panelPadding,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(34 * scale),
+                                border: Border.all(
+                                  color: const Color(0xFFE0E8F1),
+                                  width: 1.5,
+                                ),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Color(0x0B253B53),
+                                    blurRadius: 28,
+                                    offset: Offset(0, 8),
+                                  ),
+                                ],
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
-                                  _buildFieldLabel('USERNAME', scale),
-                                  SizedBox(height: 10 * scale),
-                                  _buildUsernameField(scale),
-                                  SizedBox(height: 32 * scale),
-                                  _buildFieldLabel('PASSWORD', scale),
-                                  SizedBox(height: 10 * scale),
-                                  _buildPasswordField(scale),
-                                  SizedBox(height: 40 * scale),
-                                  Center(child: _buildCaptcha(scale)),
+                                  _buildRoleSelector(scale),
                                   SizedBox(height: 34 * scale),
-                                  _buildLoginButton(scale),
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 16 * scale,
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
+                                      children: [
+                                        _buildFieldLabel(
+                                          _isRetailer ? 'USERNAME' : 'EMAIL',
+                                          scale,
+                                        ),
+                                        SizedBox(height: 10 * scale),
+                                        _buildUsernameField(scale),
+                                        if (_usernameError != null)
+                                          _buildErrorMessage(
+                                            _usernameError!,
+                                            scale,
+                                          ),
+                                        SizedBox(height: 32 * scale),
+                                        _buildFieldLabel('PASSWORD', scale),
+                                        SizedBox(height: 10 * scale),
+                                        _buildPasswordField(scale),
+                                        if (_passwordError != null)
+                                          _buildErrorMessage(
+                                            _passwordError!,
+                                            scale,
+                                          ),
+                                        SizedBox(height: 40 * scale),
+                                        Center(child: _buildCaptcha(scale)),
+                                        if (_captchaError != null)
+                                          _buildErrorMessage(
+                                            _captchaError!,
+                                            scale,
+                                            centered: true,
+                                          ),
+                                        SizedBox(height: 34 * scale),
+                                        _buildLoginButton(scale),
+                                      ],
+                                    ),
+                                  ),
                                 ],
+                              ),
+                            ),
+                            SizedBox(height: 40 * scale),
+                            Text(
+                              '© 2026 Top it Up. E&OE. All Rights Reserved',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: const Color(0xFF91A5BF),
+                                fontSize: 22 * scale,
+                                height: 1.25,
                               ),
                             ),
                           ],
                         ),
                       ),
-                      SizedBox(height: 40 * scale),
-                      Text(
-                        '© 2026 Top it Up. E&OE. All Rights Reserved',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: const Color(0xFF91A5BF),
-                          fontSize: 22 * scale,
-                          height: 1.25,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),
@@ -144,23 +243,48 @@ class _LoginScreenState extends State<LoginScreen> {
         borderRadius: BorderRadius.circular(24 * scale),
         border: Border.all(color: const Color(0xFFDDE6F0), width: 2),
       ),
-      child: Row(
-        children: [
-          _roleButton(
-            label: 'Retailer',
-            icon: Icons.storefront_outlined,
-            selected: _isRetailer,
-            scale: scale,
-            onTap: () => setState(() => _isRetailer = true),
-          ),
-          _roleButton(
-            label: 'Supplier',
-            icon: Icons.local_shipping_outlined,
-            selected: !_isRetailer,
-            scale: scale,
-            onTap: () => setState(() => _isRetailer = false),
-          ),
-        ],
+      child: SizedBox(
+        height: 72 * scale,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            AnimatedAlign(
+              alignment: _isRetailer
+                  ? Alignment.centerLeft
+                  : Alignment.centerRight,
+              duration: const Duration(milliseconds: 220),
+              curve: Curves.easeOutCubic,
+              child: FractionallySizedBox(
+                widthFactor: 0.5,
+                heightFactor: 1,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(18 * scale),
+                  ),
+                ),
+              ),
+            ),
+            Row(
+              children: [
+                _roleButton(
+                  label: 'Retailer',
+                  icon: Icons.storefront_outlined,
+                  selected: _isRetailer,
+                  scale: scale,
+                  onTap: () => _selectRole(true),
+                ),
+                _roleButton(
+                  label: 'Supplier',
+                  icon: Icons.local_shipping_outlined,
+                  selected: !_isRetailer,
+                  scale: scale,
+                  onTap: () => _selectRole(false),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -174,44 +298,29 @@ class _LoginScreenState extends State<LoginScreen> {
   }) {
     final color = selected ? const Color(0xFFC71920) : const Color(0xFF657A96);
     return Expanded(
-      child: Material(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(18 * scale),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(18 * scale),
-          onTap: onTap,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 160),
-            height: 72 * scale,
-            decoration: BoxDecoration(
-              color: selected ? Colors.white : Colors.transparent,
-              borderRadius: BorderRadius.circular(18 * scale),
-              boxShadow: selected
-                  ? const [
-                      BoxShadow(
-                        color: Color(0x1A31445A),
-                        blurRadius: 7,
-                        offset: Offset(0, 2),
-                      ),
-                    ]
-                  : null,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 220),
+              curve: Curves.easeOutCubic,
+              child: Icon(icon, size: 28 * scale, color: color),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(icon, size: 28 * scale, color: color),
-                SizedBox(width: 12 * scale),
-                Text(
-                  label,
-                  style: TextStyle(
-                    color: color,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 25 * scale,
-                  ),
-                ),
-              ],
+            SizedBox(width: 12 * scale),
+            AnimatedDefaultTextStyle(
+              duration: const Duration(milliseconds: 220),
+              curve: Curves.easeOutCubic,
+              style: TextStyle(
+                color: color,
+                fontWeight: FontWeight.w700,
+                fontSize: 25 * scale,
+              ),
+              child: Text(label),
             ),
-          ),
+          ],
         ),
       ),
     );
@@ -233,16 +342,27 @@ class _LoginScreenState extends State<LoginScreen> {
     return _buildInputFrame(
       scale: scale,
       child: TextField(
-        controller: _usernameController,
+        key: ValueKey(_isRetailer ? 'retailer-identity' : 'supplier-identity'),
+        controller: _identityController,
+        onChanged: (_) {
+          if (_usernameError != null) {
+            setState(() => _usernameError = null);
+          }
+        },
         textAlignVertical: TextAlignVertical.center,
         style: TextStyle(color: const Color(0xFF34445C), fontSize: 27 * scale),
         decoration: InputDecoration(
-          hintText: 'Enter your username or terminal ID',
+          hintText: _isRetailer
+              ? 'Enter your username or terminal ID'
+              : 'Enter your supplier email address',
           hintStyle: TextStyle(
             color: const Color(0xFF91A5BF),
             fontSize: 27 * scale,
           ),
-          prefixIcon: Icon(Icons.person_outline, size: 34 * scale),
+          prefixIcon: Icon(
+            _isRetailer ? Icons.person_outline : Icons.email_outlined,
+            size: 34 * scale,
+          ),
           prefixIconColor: const Color(0xFF91A5BF),
           prefixIconConstraints: BoxConstraints(
             minWidth: 72 * scale,
@@ -263,7 +383,13 @@ class _LoginScreenState extends State<LoginScreen> {
     return _buildInputFrame(
       scale: scale,
       child: TextField(
+        key: ValueKey(_isRetailer ? 'retailer-password' : 'supplier-password'),
         controller: _passwordController,
+        onChanged: (_) {
+          if (_passwordError != null) {
+            setState(() => _passwordError = null);
+          }
+        },
         obscureText: _obscurePassword,
         textAlignVertical: TextAlignVertical.center,
         style: TextStyle(color: const Color(0xFF34445C), fontSize: 27 * scale),
@@ -326,6 +452,41 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  Widget _buildErrorMessage(
+    String message,
+    double scale, {
+    bool centered = false,
+  }) {
+    return Padding(
+      padding: EdgeInsets.only(top: 8 * scale),
+      child: Row(
+        mainAxisAlignment: centered
+            ? MainAxisAlignment.center
+            : MainAxisAlignment.start,
+        children: [
+          Icon(
+            Icons.error_outline,
+            color: const Color(0xFFC71920),
+            size: 18 * scale,
+          ),
+          SizedBox(width: 6 * scale),
+          Flexible(
+            child: Text(
+              message,
+              textAlign: centered ? TextAlign.center : TextAlign.start,
+              style: TextStyle(
+                color: const Color(0xFFC71920),
+                fontSize: 21 * scale,
+                fontWeight: FontWeight.w600,
+                height: 1.25,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildCaptcha(double scale) {
     return SizedBox(
       width: 516 * scale,
@@ -365,8 +526,10 @@ class _LoginScreenState extends State<LoginScreen> {
               children: [
                 SizedBox(width: 8 * scale),
                 InkWell(
-                  onTap: () =>
-                      setState(() => _captchaChecked = !_captchaChecked),
+                  onTap: () => setState(() {
+                    _captchaChecked = !_captchaChecked;
+                    if (_captchaChecked) _captchaError = null;
+                  }),
                   child: Container(
                     width: 50 * scale,
                     height: 50 * scale,
@@ -439,7 +602,7 @@ class _LoginScreenState extends State<LoginScreen> {
           color: Colors.transparent,
           child: InkWell(
             borderRadius: BorderRadius.circular(24 * scale),
-            onTap: () {},
+            onTap: _validateAndLogin,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
