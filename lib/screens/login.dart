@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../shared/widgets/topitup_brand_lockup.dart';
+import 'dashboard.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -69,7 +70,11 @@ class _LoginScreenState extends State<LoginScreen> {
     onLoginButtonPressed();
   }
 
-  void onLoginButtonPressed() {}
+  void onLoginButtonPressed() {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute<void>(builder: (_) => const DashboardScreen()),
+    );
+  }
 
   void _showValidationError({
     String? usernameError,
