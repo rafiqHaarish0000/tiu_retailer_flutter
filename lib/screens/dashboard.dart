@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
+import 'transfer_to_wallet_page.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -30,7 +31,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
       _supplierFlow = 0;
     });
   }
-
+Widget _buildServicePage(String title) {
+    switch (title) {
+      case 'Transfer to Wallet':
+        return TransferToWalletPage(onBack: _goHome);
+      // case 'Transfer to Stores':
+      //   return TransferToStoresPage(onBack: _goHome);
+      default:
+        return _buildTabComingSoon(title);
+    }
+  }
   static const _services = [
     _Service(
       'Transfer to Wallet',
@@ -171,8 +181,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
             _buildHeader(context),
             Expanded(
               child: _activeService != null
-                  ? _buildTabComingSoon(_activeService!)
-                  : _selectedTab == 0
+                  ? _buildServicePage(_activeService!)
+                   : _selectedTab == 0
                   ? _buildServiceGrid()
                   : _selectedTab == 1
                   ? _PayToWholesalerPage(onBack: _goHome)
@@ -481,7 +491,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 }
-
+ 
 class _SupplierOrdersPage extends StatefulWidget {
   const _SupplierOrdersPage({required this.onBack, required this.onPlaceOrder});
 
