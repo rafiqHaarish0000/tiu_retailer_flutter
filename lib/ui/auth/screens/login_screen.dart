@@ -2,8 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../shared/widgets/topitup_brand_lockup.dart';
-import 'dashboard.dart';
+import '../../../shared/widgets/topitup_brand_lockup.dart';
+import '../../dashboard/screens/dashboard_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
