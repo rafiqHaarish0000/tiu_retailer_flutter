@@ -54,6 +54,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
   }
 
+  void _openServiceEntry(_Service service) {
+    if (service.screen is WholesalerPaymentsScreen) {
+      _selectBottomTab(1);
+      return;
+    }
+    final screen = service.screen is AccountPaymentsScreen
+        ? AccountPaymentsScreen(onBack: _goHome)
+        : service.screen;
+    _openService(screen);
+  }
+
   void _goHome() {
     setState(() {
       _activeService = null;
@@ -87,7 +98,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   : _selectedTab == 0
                   ? _HomeScreen(
                       services: _services,
-                      onServiceTap: (service) => _openService(service.screen),
+                      onServiceTap: _openServiceEntry,
                     )
                   : _selectedTab == 1
                   ? _PayToWholesalerPage(onBack: _goHome)
