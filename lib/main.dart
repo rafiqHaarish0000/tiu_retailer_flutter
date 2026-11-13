@@ -4,12 +4,9 @@ import 'package:flutter/services.dart';
 import 'ui/auth/screens/login_screen.dart';
 import 'theme/app_theme.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setEnabledSystemUIMode(
-    SystemUiMode.manual,
-    overlays: const [SystemUiOverlay.top],
-  );
+  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
   runApp(const TopitupRetailerApp());
 }
 

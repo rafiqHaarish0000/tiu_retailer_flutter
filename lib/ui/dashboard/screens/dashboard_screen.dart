@@ -59,8 +59,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
       _selectBottomTab(1);
       return;
     }
+    if (service.screen is SupplierOrdersModuleScreen) {
+      _selectBottomTab(2);
+      return;
+    }
     final screen = service.screen is AccountPaymentsScreen
         ? AccountPaymentsScreen(onBack: _goHome)
+        : service.screen is MySalesTransactionsScreen
+        ? MySalesTransactionsScreen(onBack: _goHome)
+        : service.screen is CommissionsAndInvoicesScreen
+        ? CommissionsAndInvoicesScreen(onBack: _goHome)
+        : service.screen is ViewOtpScreen
+        ? ViewOtpScreen(onBack: _goHome)
+        : service.screen is TopItUpBankingDetailsScreen
+        ? TopItUpBankingDetailsScreen(onBack: _goHome)
         : service.screen;
     _openService(screen);
   }
