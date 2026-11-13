@@ -42,17 +42,23 @@ class _ServiceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white,
+      color: service.disabled ? const Color(0xFFFBFBFB) : Colors.white,
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
-        onTap: onTap,
+        onTap: service.disabled
+            ? () => _showComingSoonToast(context, service.title)
+            : onTap,
         child: Container(
           padding: const EdgeInsets.fromLTRB(8, 16, 8, 10),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: service.disabled ? const Color(0xFFFBFBFB) : Colors.white,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: const Color(0xFFDDE5EE)),
+            border: Border.all(
+              color: service.disabled
+                  ? const Color(0xFFE8EAEC)
+                  : const Color(0xFFDDE5EE),
+            ),
             boxShadow: const [
               BoxShadow(
                 color: Color(0x0A1E3854),
@@ -61,45 +67,103 @@ class _ServiceCard extends StatelessWidget {
               ),
             ],
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+          child: Stack(
+            clipBehavior: Clip.none,
             children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: service.iconBackground,
-                  shape: BoxShape.circle,
+              Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: service.disabled
+                            ? const Color(0xFFE8E8E8)
+                            : service.iconBackground,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        service.icon,
+                        color: service.disabled
+                            ? const Color(0xFF929292)
+                            : service.iconColor,
+                        size: 25,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      service.title,
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: service.disabled
+                            ? const Color(0xFF969696)
+                            : const Color(0xFF1E2A40),
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13,
+                        height: 1.2,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      service.subtitle,
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: service.disabled
+                            ? const Color(0xFFB8B8B8)
+                            : const Color(0xFF8498B6),
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
                 ),
-                child: Icon(service.icon, color: service.iconColor, size: 25),
               ),
-              const SizedBox(height: 12),
-              Text(
-                service.title,
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: Color(0xFF1E2A40),
-                  fontWeight: FontWeight.w700,
-                  fontSize: 13,
-                  height: 1.2,
+              if (service.disabled)
+                Positioned(
+                  top: -8,
+                  right: -1,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF858585),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Text(
+                      'COMING SOON',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 8,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: .2,
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                service.subtitle,
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(color: Color(0xFF8498B6), fontSize: 11),
-              ),
             ],
           ),
         ),
       ),
     );
   }
+}
+
+void _showComingSoonToast(BuildContext context, String productName) {
+  ScaffoldMessenger.of(context)
+    ..hideCurrentSnackBar()
+    ..showSnackBar(
+      SnackBar(
+        content: Text('$productName is coming soon in the next release!'),
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 3),
+      ),
+    );
 }
 
 class ComingSoonScreen extends StatelessWidget {
@@ -128,8 +192,9 @@ class _Service {
     this.icon,
     this.iconBackground,
     this.iconColor,
-    this.screen,
-  );
+    this.screen, {
+    this.disabled = false,
+  });
 
   final String title;
   final String subtitle;
@@ -137,4 +202,5 @@ class _Service {
   final Color iconBackground;
   final Color iconColor;
   final Widget screen;
+  final bool disabled;
 }

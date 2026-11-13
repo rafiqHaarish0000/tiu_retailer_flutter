@@ -24,6 +24,7 @@ const _dashboardServices = [
     Color(0xFFF5ECFF),
     Color(0xFF8B25F5),
     TopItUpVoucherScreen(),
+    disabled: true,
   ),
   _Service(
     'Pay Suppliers',
@@ -32,6 +33,7 @@ const _dashboardServices = [
     Color(0xFFEAF3FF),
     Color(0xFF1769E8),
     PaySuppliersScreen(),
+    disabled: true,
   ),
   _Service(
     'Wholesaler Payments',
@@ -96,6 +98,7 @@ const _dashboardServices = [
     Color(0xFFE8FAEF),
     Color(0xFF15934B),
     MoneyTransfersScreen(),
+    disabled: true,
   ),
   _Service(
     'POS Users',
