@@ -73,6 +73,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ? ViewOtpScreen(onBack: _goHome)
         : service.screen is TopItUpBankingDetailsScreen
         ? TopItUpBankingDetailsScreen(onBack: _goHome)
+        : service.screen is DepositHistoryScreen
+        ? DepositHistoryScreen(onBack: _goHome)
         : service.screen;
     _openService(screen);
   }

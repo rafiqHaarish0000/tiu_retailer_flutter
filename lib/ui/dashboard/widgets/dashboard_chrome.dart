@@ -175,22 +175,47 @@ extension _DashboardChrome on _DashboardScreenState {
       child: Row(
         children: List.generate(5, (index) {
           if (index == 2) {
+            final active = _selectedTab == 2;
             return Expanded(
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTap: () => _selectBottomTab(2),
                 child: Center(
-                  child: Container(
-                    width: 52,
-                    height: 52,
-                    decoration: const BoxDecoration(
-                      color: AppColors.brandRed,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.local_shipping_outlined,
-                      color: Colors.white,
-                      size: 29,
+                  child: Transform.translate(
+                    offset: active ? const Offset(0, -4) : Offset.zero,
+                    child: Container(
+                      width: active ? 56 : 52,
+                      height: active ? 56 : 52,
+                      decoration: const BoxDecoration(
+                        color: Color(0x1FC8102E),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color(0x40C8102E),
+                            blurRadius: 14,
+                            offset: Offset(0, 6),
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: Container(
+                          width: active ? 44 : 52,
+                          height: active ? 44 : 52,
+                          decoration: const BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [Color(0xFFC8102E), Color(0xFFE97800)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.local_shipping_outlined,
+                            color: Colors.white,
+                            size: 29,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),
