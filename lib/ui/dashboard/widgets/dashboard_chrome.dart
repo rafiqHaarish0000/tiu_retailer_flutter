@@ -1,5 +1,79 @@
 part of '../screens/dashboard_screen.dart';
 
+class _DashboardContactFab extends StatelessWidget {
+  const _DashboardContactFab();
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.all(5),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(15),
+      border: Border.all(color: const Color(0xFFDCE5EF)),
+      boxShadow: const [
+        BoxShadow(
+          color: Color(0x1A1E3854),
+          blurRadius: 7,
+          offset: Offset(0, 2),
+        ),
+      ],
+    ),
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _ContactButton(
+          icon: Icons.phone,
+          color: const Color(0xFF2864F0),
+          background: const Color(0xFFEAF2FF),
+          onTap: () {},
+        ),
+        const SizedBox(height: 4),
+        _ContactButton(
+          icon: Icons.chat,
+          color: const Color(0xFF168B68),
+          background: const Color(0xFFE8FFF6),
+          onTap: () {},
+        ),
+        const SizedBox(height: 4),
+        _ContactButton(
+          icon: Icons.mail,
+          color: AppColors.brandRed,
+          background: const Color(0xFFFFEEF1),
+          onTap: () {},
+        ),
+      ],
+    ),
+  );
+}
+
+class _ContactButton extends StatelessWidget {
+  const _ContactButton({
+    required this.icon,
+    required this.color,
+    required this.background,
+    required this.onTap,
+  });
+  final IconData icon;
+  final Color color;
+  final Color background;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Material(
+    color: background,
+    borderRadius: BorderRadius.circular(11),
+    child: InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(11),
+      child: SizedBox(
+        width: 40,
+        height: 40,
+        child: Icon(icon, color: color, size: 20),
+      ),
+    ),
+  );
+}
+
 extension _DashboardChrome on _DashboardScreenState {
   Widget _buildTabComingSoon(String title) {
     return Center(

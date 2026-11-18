@@ -1,14 +1,20 @@
 part of '../../dashboard/screens/dashboard_screen.dart';
 
 class _HomeScreen extends StatelessWidget {
-  const _HomeScreen({required this.services, required this.onServiceTap});
+  const _HomeScreen({
+    required this.services,
+    required this.onServiceTap,
+    required this.scrollController,
+  });
 
   final List<_Service> services;
   final ValueChanged<_Service> onServiceTap;
+  final ScrollController scrollController;
 
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
+      controller: scrollController,
       slivers: [
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
@@ -55,7 +61,9 @@ class _ServiceCard extends StatelessWidget {
             color: service.disabled ? const Color(0xFFFBFBFB) : Colors.white,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: service.disabled
+              color: service.danger
+                  ? const Color(0xFFFFB7BE)
+                  : service.disabled
                   ? const Color(0xFFE8EAEC)
                   : const Color(0xFFDDE5EE),
             ),
@@ -78,14 +86,18 @@ class _ServiceCard extends StatelessWidget {
                       width: 48,
                       height: 48,
                       decoration: BoxDecoration(
-                        color: service.disabled
+                        color: service.danger
+                            ? const Color(0xFFFFEFF1)
+                            : service.disabled
                             ? const Color(0xFFE8E8E8)
                             : service.iconBackground,
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
                         service.icon,
-                        color: service.disabled
+                        color: service.danger
+                            ? AppColors.brandRed
+                            : service.disabled
                             ? const Color(0xFF929292)
                             : service.iconColor,
                         size: 25,
@@ -98,7 +110,9 @@ class _ServiceCard extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: service.disabled
+                        color: service.danger
+                            ? AppColors.brandRed
+                            : service.disabled
                             ? const Color(0xFF969696)
                             : const Color(0xFF1E2A40),
                         fontWeight: FontWeight.w700,
@@ -113,7 +127,9 @@ class _ServiceCard extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: service.disabled
+                        color: service.danger
+                            ? AppColors.brandRed
+                            : service.disabled
                             ? const Color(0xFFB8B8B8)
                             : const Color(0xFF8498B6),
                         fontSize: 11,
@@ -194,6 +210,7 @@ class _Service {
     this.iconColor,
     this.screen, {
     this.disabled = false,
+    this.danger = false,
   });
 
   final String title;
@@ -203,4 +220,5 @@ class _Service {
   final Color iconColor;
   final Widget screen;
   final bool disabled;
+  final bool danger;
 }

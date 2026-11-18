@@ -7,6 +7,7 @@ import '../../auth/screens/login_screen.dart';
 import '../../modules/account_payments/screens/account_payments_screen.dart';
 import '../../modules/commissions_and_invoices/screens/commissions_and_invoices_screen.dart';
 import '../../modules/deposit_history/screens/deposit_history_screen.dart';
+import '../../modules/device_stolen/screens/device_stolen_screen.dart';
 import '../../modules/financial_transactions/screens/financial_transactions_screen.dart';
 import '../../modules/money_transfers/screens/money_transfers_screen.dart';
 import '../../modules/my_devices/screens/my_devices_screen.dart';
@@ -46,6 +47,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedTab = 0;
   int _supplierFlow = 0;
   Widget? _activeService;
+  final ScrollController _homeScrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _homeScrollController.dispose();
+    super.dispose();
+  }
 
   void _openService(Widget screen) {
     setState(() {
@@ -55,6 +63,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   void _openServiceEntry(_Service service) {
+    if (service.screen is DeviceStolenScreen) {
+      showDialog<void>(
+        context: context,
+        barrierColor: const Color(0x990D1220),
+        builder: (_) => const DeviceStolenScreen(),
+      );
+      return;
+    }
     if (service.screen is WholesalerPaymentsScreen) {
       _selectBottomTab(1);
       return;
@@ -75,6 +91,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ? TopItUpBankingDetailsScreen(onBack: _goHome)
         : service.screen is DepositHistoryScreen
         ? DepositHistoryScreen(onBack: _goHome)
+        : service.screen is FinancialTransactionsScreen
+        ? FinancialTransactionsScreen(onBack: _goHome)
+        : service.screen is SalesAndShiftReportsScreen
+        ? SalesAndShiftReportsScreen(onBack: _goHome)
+        : service.screen is PosUsersScreen
+        ? PosUsersScreen(onBack: _goHome)
+        : service.screen is WebsiteUsersScreen
+        ? WebsiteUsersScreen(onBack: _goHome)
+        : service.screen is MyDevicesScreen
+        ? MyDevicesScreen(onBack: _goHome)
         : service.screen;
     _openService(screen);
   }
@@ -103,23 +129,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
       backgroundColor: const Color(0xFFF5F8FC),
       body: SafeArea(
         bottom: false,
-        child: Column(
+        child: Stack(
           children: [
-            _buildHeader(context),
-            Expanded(
-              child: _activeService != null
-                  ? _activeService!
-                  : _selectedTab == 0
-                  ? _HomeScreen(
-                      services: _services,
-                      onServiceTap: _openServiceEntry,
-                    )
-                  : _selectedTab == 1
-                  ? _PayToWholesalerPage(onBack: _goHome)
-                  : _selectedTab == 2
-                  ? _buildSupplierFlow()
-                  : _buildTabComingSoon(_tabTitle(_selectedTab)),
+            Column(
+              children: [
+                _buildHeader(context),
+                Expanded(
+                  child: _activeService != null
+                      ? _activeService!
+                      : _selectedTab == 0
+                      ? _HomeScreen(
+                          services: _services,
+                          onServiceTap: _openServiceEntry,
+                          scrollController: _homeScrollController,
+                        )
+                      : _selectedTab == 1
+                      ? _PayToWholesalerPage(onBack: _goHome)
+                      : _selectedTab == 2
+                      ? _buildSupplierFlow()
+                      : _buildTabComingSoon(_tabTitle(_selectedTab)),
+                ),
+              ],
             ),
+            if (_activeService == null && _selectedTab == 0)
+              const Positioned(
+                right: 12,
+                bottom: 210,
+                child: _DashboardContactFab(),
+              ),
           ],
         ),
       ),

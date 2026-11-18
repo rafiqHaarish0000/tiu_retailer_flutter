@@ -148,4 +148,13 @@ const _dashboardServices = [
     Color(0xFFB55A00),
     TopItUpBankingDetailsScreen(),
   ),
+  _Service(
+    'Device Stolen',
+    'Emergency Lock',
+    Icons.gpp_maybe_outlined,
+    Color(0xFFFFEFF1),
+    AppColors.brandRed,
+    DeviceStolenScreen(),
+    danger: true,
+  ),
 ];
